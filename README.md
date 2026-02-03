@@ -6,6 +6,11 @@ A comprehensive machine learning project that predicts Formula 1 race winners us
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-1.0+-orange.svg)](https://scikit-learn.org/)
 [![XGBoost](https://img.shields.io/badge/XGBoost-Latest-red.svg)](https://xgboost.readthedocs.io/)
 [![Flask](https://img.shields.io/badge/Flask-3.0+-green.svg)](https://flask.palletsprojects.com/)
+[![pandas](https://img.shields.io/badge/pandas-Latest-150458.svg)](https://pandas.pydata.org/)
+[![NumPy](https://img.shields.io/badge/NumPy-Latest-013243.svg)](https://numpy.org/)
+[![Matplotlib](https://img.shields.io/badge/Matplotlib-Latest-11557c.svg)](https://matplotlib.org/)
+[![Seaborn](https://img.shields.io/badge/Seaborn-Latest-blue.svg)](https://seaborn.pydata.org/)
+[![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-F37626.svg)](https://jupyter.org/)
 
 ## 📋 Table of Contents
 
@@ -57,7 +62,7 @@ The model integrates 12 CSV files:
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/heyisula/f1.git
    cd f1
    ```
 
