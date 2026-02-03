@@ -22,6 +22,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// Convert snake_case to Title Case (e.g., max_verstappen -> Max Verstappen)
+function formatName(snakeCaseStr) {
+    return snakeCaseStr
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+}
+
 function fillDropdown(dropdownId, items, defaultValue) {
     const dropdown = document.getElementById(dropdownId);
 
@@ -31,7 +39,7 @@ function fillDropdown(dropdownId, items, defaultValue) {
     items.forEach(item => {
         const option = document.createElement('option');
         option.value = item;
-        option.textContent = item;
+        option.textContent = formatName(item); // Format the display text
         dropdown.appendChild(option);
     });
 
