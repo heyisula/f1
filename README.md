@@ -1,4 +1,4 @@
-# 🏎️ Formula 1 Race Winner Prediction Model
+# Formula 1 Race Winner Prediction Model
 
 A comprehensive machine learning project that predicts Formula 1 race winners using historical data from 1950 to 2024. The system compares multiple ML algorithms, automatically selects the best performer, and deploys it via a premium web application with a modern dark-mode interface.
 
