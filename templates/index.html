@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Race Predictor | NextGen AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --f1-red: #e10600;
+            --dark-bg: #0b0d10;
+            --card-bg: #15171e;
+            --text-main: #ffffff;
+            --text-muted: #8a8d93;
+            --accent-glow: rgba(225, 6, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Background Effects */
+        .bg-gradient {
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radical-gradient(circle at center, rgba(20,20,30,0) 0%, var(--dark-bg) 70%);
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        header {
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #fff, #999);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .highlight {
+            color: var(--f1-red);
+            -webkit-text-fill-color: var(--f1-red);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Input Card */
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        select, input {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--f1-red);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* Range Slider */
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            background-image: linear-gradient(var(--f1-red), var(--f1-red));
+            background-repeat: no-repeat;
+            background-size: 0% 100%; /* JS will update this */
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .btn-predict {
+            width: 100%;
+            padding: 1.2rem;
+            background: var(--f1-red);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-predict:hover {
+            background: #ff1e1e;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px var(--accent-glow);
+        }
+
+        .btn-predict::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-predict:hover::after {
+            left: 100%;
+        }
+
+        /* Results Panel */
+        .result-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-left: 2px solid rgba(255,255,255,0.05);
+        }
+
+        @media (max-width: 768px) {
+            .result-panel {
+                border-left: none;
+                border-top: 2px solid rgba(255,255,255,0.05);
+                padding-top: 2rem;
+            }
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .probability-ring {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 10px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 2rem;
+            background: conic-gradient(var(--f1-red) 0deg, transparent 0deg); /* JS updates 1st val */
+            transition: --angle 1s ease;
+        }
+        
+        /* Pseudo-element for inner circle to make it a ring */
+        .probability-ring::before {
+            content: '';
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: var(--card-bg);
+        }
+
+        .prob-text {
+            position: absolute;
+            font-size: 3rem;
+            font-weight: 800;
+            z-index: 2;
+        }
+
+        .prediction-label {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .prediction-label.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .loader {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-left-color: var(--f1-red);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>F1 <span class="highlight">Predictor</span></h1>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Left: Input Form -->
+            <div class="card">
+                <form id="predict-form">
+                    <div class="form-group">
+                        <label>Driver</label>
+                        <select id="driver" required></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Constructor (Team)</label>
+                        <select id="constructor" required></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Circuit</label>
+                        <select id="circuit" required></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Grid Start Position: <span id="grid-val" class="highlight">1</span></label>
+                        <input type="range" id="grid" min="1" max="20" value="1" oninput="updateRange('grid', this.value)">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Laps</label>
+                        <input type="number" id="laps" value="50" min="1" max="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Current Points</label>
+                        <input type="number" id="points" value="0" min="0">
+                    </div>
+
+                    <button type="submit" class="btn-predict">Analyze Race</button>
+                </form>
+            </div>
+
+            <!-- Right: Results -->
+            <div class="card result-panel">
+                <div class="result-title">AI WIN PROBABILITY</div>
+                
+                <div class="loader" id="loader"></div>
+                
+                <div class="probability-ring" id="prob-ring" style="background: conic-gradient(rgba(255,255,255,0.1) 0%, transparent 0%);">
+                    <span class="prob-text" id="prob-text">--%</span>
+                </div>
+
+                <div class="prediction-label" id="prediction-label">
+                    Ready to Predict
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Update range slider visual
+        function updateRange(id, val) {
+            document.getElementById(id + '-val').innerText = val;
+            const el = document.getElementById(id);
+            const percent = ((val - el.min) / (el.max - el.min)) * 100;
+            // Since grid 1 is better, maybe reverse gradient logic? 
+            // For now standard fill
+            el.style.backgroundSize = percent + '% 100%';
+        }
+
+        // On Load: Fetch Data for Dropdowns
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/meta');
+                const data = await response.json();
+
+                populateSelect('driver', data.drivers);
+                populateSelect('constructor', data.constructors);
+                populateSelect('circuit', data.circuits);
+
+                // Initialize range slider background
+                updateRange('grid', 1);
+            } catch (e) {
+                console.error("Failed to fetch meta data", e);
+            }
+        });
+
+        function populateSelect(id, items) {
+            const select = document.getElementById(id);
+            // Sort items for better UX
+            items.sort();
+            items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item;
+                opt.innerText = item;
+                select.appendChild(opt);
+            });
+            
+            // Set some defaults if possible
+            if(id === 'constructor') select.value = 'red_bull';
+            if(id === 'driver') select.value = 'max_verstappen';
+        }
+
+        // Handle Submission
+        document.getElementById('predict-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // UI States
+            const btn = document.querySelector('.btn-predict');
+            const loader = document.getElementById('loader');
+            const ring = document.getElementById('prob-ring');
+            const probText = document.getElementById('prob-text');
+            const label = document.getElementById('prediction-label');
+
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            loader.style.display = 'block';
+            ring.style.display = 'none';
+            label.classList.remove('visible');
+
+            const payload = {
+                driver: document.getElementById('driver').value,
+                constructor: document.getElementById('constructor').value,
+                circuit: document.getElementById('circuit').value,
+                grid: parseInt(document.getElementById('grid').value),
+                laps: parseInt(document.getElementById('laps').value),
+                points: parseFloat(document.getElementById('points').value)
+            };
+
+            try {
+                const res = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await res.json();
+                
+                // Simulate processing time for effect
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    ring.style.display = 'flex';
+                    
+                    // Update Values
+                    const percentage = (data.probability * 100).toFixed(1);
+                    probText.innerText = percentage + '%';
+                    
+                    // Update Ring Gradient
+                    const color = data.is_winner ? '#e10600' : '#444';
+                    ring.style.background = `conic-gradient(${color} ${percentage}%, transparent ${percentage}%)`;
+                    
+                    // Update Label
+                    label.innerText = data.is_winner ? 'WINNER PREDICTED' : 'LOW CHANCE OF WIN';
+                    label.style.color = data.is_winner ? '#e10600' : '#8a8d93';
+                    label.classList.add('visible');
+
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                }, 800);
+
+            } catch (err) {
+                console.error(err);
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

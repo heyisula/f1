@@ -1,79 +1,87 @@
-import gradio as gr
-import pandas as pd
+from flask import Flask, render_template, request, jsonify
 import joblib
+import pandas as pd
 import numpy as np
 
-# Load the trained model and helper objects
+app = Flask(__name__)
+
+# Load Model
 try:
     model_data = joblib.load('models/best_f1_model.pkl')
     model = model_data['model']
     le_driver = model_data['le_driver']
     le_constructor = model_data['le_constructor']
     le_circuit = model_data['le_circuit']
-    scaler = model_data.get('scaler') # Get scaler if it exists
+    scaler = model_data.get('scaler')
     feature_names = model_data['feature_names']
-    print(f"Loaded model: {model_data.get('model_name', 'Unknown')}")
-except FileNotFoundError:
-    print("Model file not found. Please run train.ipynb first.")
+    print(f"Flask App Loaded Model: {model_data.get('model_name', 'Unknown')}")
+except Exception as e:
+    print(f"Error loading model: {e}")
     exit()
 
-def predict_winner(grid_position, points, driver_name, constructor_name, circuit_name, laps):
-    # Create a dataframe for the input
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/meta', methods=['GET'])
+def get_meta():
+    """Return lists of drivers, constructors, circuits for the frontend dropdowns"""
+    return jsonify({
+        'drivers': sorted(list(le_driver.classes_)),
+        'constructors': sorted(list(le_constructor.classes_)),
+        'circuits': sorted(list(le_circuit.classes_))
+    })
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    data = request.json
+    
     try:
-        # Encode inputs
-        driver_id = le_driver.transform([driver_name])[0] if driver_name in le_driver.classes_ else -1
-        constructor_id = le_constructor.transform([constructor_name])[0] if constructor_name in le_constructor.classes_ else -1
-        circuit_id = le_circuit.transform([circuit_name])[0] if circuit_name in le_circuit.classes_ else -1
+        driver = data['driver']
+        constructor = data['constructor']
+        circuit = data['circuit']
+        grid = data['grid']
+        laps = data['laps']
+        points = data['points']
         
-        # We need to construct the feature vector matching the training data
-        input_data = pd.DataFrame({
-            'grid': [grid_position],
-            'points': [points],
-            'laps': [laps],
-            'driverId_enc': [driver_id],
-            'constructorId_enc': [constructor_id],
-            'circuitId_enc': [circuit_id],
-            'driver_age': [30] # approximated as mean age, or could add another input
-        })
+        # Encoding
+        # Handle unknown categories gracefully (fallback to first class or -1)
+        driver_enc = le_driver.transform([driver])[0] if driver in le_driver.classes_ else -1
+        constructor_enc = le_constructor.transform([constructor])[0] if constructor in le_constructor.classes_ else -1
+        circuit_enc = le_circuit.transform([circuit])[0] if circuit in le_circuit.classes_ else -1
         
-        # Ensure column order matches training
-        input_data = input_data[feature_names]
+        # Prepare DataFrame
+        # 'grid', 'points', 'laps', 'driverId_enc', 'constructorId_enc', 'circuitId_enc', 'driver_age'
+        # Approximating age as 28 since we don't ask for user DOB in basic UI
+        input_df = pd.DataFrame([{
+            'grid': grid,
+            'points': points,
+            'laps': laps,
+            'driverId_enc': driver_enc,
+            'constructorId_enc': constructor_enc,
+            'circuitId_enc': circuit_enc,
+            'driver_age': 28 
+        }])
         
-        # Scale numerical features if scaler exists
+        # Ensure order
+        input_df = input_df[feature_names]
+        
+        # Scale
         if scaler:
             cols_to_scale = ['grid', 'points', 'laps', 'driver_age']
-            input_data[cols_to_scale] = scaler.transform(input_data[cols_to_scale])
+            input_df[cols_to_scale] = scaler.transform(input_df[cols_to_scale])
+            
+        # Predict
+        prob = model.predict_proba(input_df)[0][1] # Probability of winning
+        prediction = int(model.predict(input_df)[0])
         
-        # Predict probability
-        prob = model.predict_proba(input_data)[0][1] # Probability of class 1 (Winner)
-        prediction = model.predict(input_data)[0]
-        
-        result_text = "Winner!" if prediction == 1 else "Not a Winner"
-        return f"Prediction: {result_text} (Win Probability: {prob:.2%})"
-        
+        return jsonify({
+            'probability': float(prob),
+            'is_winner': bool(prediction == 1)
+        })
+
     except Exception as e:
-        return f"Error making prediction: {str(e)}"
+        return jsonify({'error': str(e)}), 400
 
-# Get lists for dropdowns
-drivers_list = list(le_driver.classes_)
-constructors_list = list(le_constructor.classes_)
-circuits_list = list(le_circuit.classes_)
-
-# Create Gradio Interface
-iface = gr.Interface(
-    fn=predict_winner,
-    inputs=[
-        gr.Slider(1, 20, step=1, label="Grid Start Position"),
-        gr.Number(label="Current Points", value=0),
-        gr.Dropdown(drivers_list, label="Driver"),
-        gr.Dropdown(constructors_list, label="Constructor (Team)"),
-        gr.Dropdown(circuits_list, label="Circuit"),
-        gr.Number(label="Laps", value=50)
-    ],
-    outputs="text",
-    title="F1 Race Winner Predictor",
-    description="Predict if a driver will win based on race conditions."
-)
-
-if __name__ == "__main__":
-    iface.launch()
+if __name__ == '__main__':
+    app.run(debug=True)
