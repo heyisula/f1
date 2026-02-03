@@ -87,7 +87,7 @@ The notebook will:
 - Train multiple ML models (Random Forest, XGBoost, etc.)
 - Compare performance metrics (ROC-AUC, F1-Score, Precision, Recall)
 - Select the best model and optimize its hyperparameters
-- Save the final model to `models/best_f1_model.pkl`
+- Save the final model to `out/models/best_f1_model.pkl`
 
 ### Step 2: Launch the Web App
 

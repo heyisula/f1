@@ -12,7 +12,7 @@ app = Flask(__name__, template_folder='webapp', static_folder='webapp/static')
 
 # Load our trained model and preprocessing objects
 try:
-    model_data = joblib.load('out/models/best_f1_model.pkl')
+    model_data = joblib.load('out/models/f1_model_data.pkl')
     model = model_data['model']
     driver_encoder = model_data['le_driver']
     team_encoder = model_data['le_constructor']
@@ -106,6 +106,6 @@ def predict_winner():
 
 
 if __name__ == '__main__':
-    print("🏎️  Starting F1 Predictor API...")
-    print("📍 Open http://127.0.0.1:5000 in your browser")
+    print("     Starting F1 Predictor API...")
+    print("     Open http://127.0.0.1:5000 in your browser")
     app.run(debug=True)
