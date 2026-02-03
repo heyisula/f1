@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Race Predictor | AI-Powered Win Prediction</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+    <header>
+        <h1>F1 <span class="highlight">Predictor</span></h1>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Input form on the left -->
+            <div class="card">
+                <form id="predict-form">
+                    <div class="form-group">
+                        <label>Driver</label>
+                        <select id="driver" required></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Constructor (Team)</label>
+                        <select id="constructor" required></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Circuit</label>
+                        <select id="circuit" required></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Grid Start Position: <span id="grid-val" class="highlight">1</span></label>
+                        <input type="range" id="grid" min="1" max="20" value="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Laps</label>
+                        <input type="number" id="laps" value="50" min="1" max="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Current Points</label>
+                        <input type="number" id="points" value="0" min="0">
+                    </div>
+
+                    <button type="submit" class="btn-predict">Analyze Race</button>
+                </form>
+            </div>
+
+            <!-- Results panel on the right -->
+            <div class="card result-panel">
+                <div class="result-title">AI Win Probability</div>
+
+                <div class="loader" id="loader"></div>
+
+                <div class="probability-ring" id="prob-ring">
+                    <span class="prob-text" id="prob-text">--</span>
+                </div>
+
+                <div class="prediction-label" id="prediction-label">
+                    Ready to Predict
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
