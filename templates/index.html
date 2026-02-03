@@ -65,15 +65,15 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             background: linear-gradient(135deg, var(--text-main) 0%, var(--text-muted) 100%);
-            background-clip: text;
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .highlight {
             background: linear-gradient(135deg, var(--f1-red) 0%, var(--accent-orange) 100%);
-            background-clip: text;
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
@@ -481,7 +481,7 @@
                     } else {
                         label.textContent = 'Unlikely to Win';
                         label.style.background = 'none';
-                        label.style.color = var(--text - muted);
+                        label.style.color = 'var(--text-muted)';
                     }
                     label.style.backgroundClip = 'text';
                     label.style.webkitBackgroundClip = 'text';
