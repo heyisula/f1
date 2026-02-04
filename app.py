@@ -10,7 +10,7 @@ import numpy as np
 
 app = Flask(__name__, template_folder='webapp', static_folder='webapp/static')
 
-# Load our trained model and preprocessing objects
+# Loading trained model and preprocessing objects
 try:
     model_data = joblib.load('out/models/f1_model_data.pkl')
     model = model_data['model']
@@ -63,13 +63,13 @@ def predict_winner():
         num_laps = data['laps']
         current_points = data['points']
         
-        # Encode categorical variables (convert names to numbers)
+        # Encoding categorical variables (convert names to numbers)
         # If we get something unknown, default to -1
         driver_encoded = driver_encoder.transform([driver])[0] if driver in driver_encoder.classes_ else -1
         team_encoded = team_encoder.transform([team])[0] if team in team_encoder.classes_ else -1
         circuit_encoded = circuit_encoder.transform([circuit])[0] if circuit in circuit_encoder.classes_ else -1
         
-        # Build the feature set that matches our training data
+        # Building the feature set that matches our training data
         # Note: We're approximating driver age at 28 since we don't ask for DOB
         features_df = pd.DataFrame([{
             'grid': grid_position,
@@ -81,10 +81,10 @@ def predict_winner():
             'driver_age': 28  # Default assumption
         }])
         
-        # Make sure features are in the right order
+        # Making sure features are in the right order
         features_df = features_df[feature_names]
         
-        # Scale the numerical features if we have a scaler
+        # Scaling the numerical features if we have a scaler
         if scaler:
             numerical_cols = ['grid', 'points', 'laps', 'driver_age']
             features_df[numerical_cols] = scaler.transform(features_df[numerical_cols])

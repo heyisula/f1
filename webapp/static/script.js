@@ -1,5 +1,3 @@
-// F1 Predictor - Main Application Logic
-
 // Update the grid position display when slider moves
 const gridSlider = document.getElementById('grid');
 const gridDisplay = document.getElementById('grid-val');
