@@ -6,19 +6,48 @@ gridSlider.addEventListener('input', (e) => {
     gridDisplay.textContent = e.target.value;
 });
 
+// Store circuit laps metadata globally
+let circuitLapsMap = {};
+
 // Load dropdown options when page loads
 window.addEventListener('DOMContentLoaded', async () => {
     try {
         const response = await fetch('/meta');
         const data = await response.json();
 
+        circuitLapsMap = data.circuit_laps || {};
+
+        // Log verified features to console (for verification as requested)
+        console.log("Verified features required by model:", data.verified_features);
+
         fillDropdown('driver', data.drivers, 'max_verstappen');
         fillDropdown('constructor', data.constructors, 'red_bull');
-        fillDropdown('circuit', data.circuits);
+        fillDropdown('circuit', data.circuits, 'albert_park');
+
+        // Initial laps set for default circuit
+        updateLapsForCircuit('albert_park');
     } catch (error) {
         console.error("Couldn't load dropdown data:", error);
     }
 });
+
+// Update laps when circuit selection changes
+document.getElementById('circuit').addEventListener('change', (e) => {
+    updateLapsForCircuit(e.target.value);
+});
+
+function updateLapsForCircuit(circuitId) {
+    if (circuitLapsMap[circuitId]) {
+        document.getElementById('laps').value = circuitLapsMap[circuitId];
+
+        // Add a visual hint that it was auto-filled
+        const lapsInput = document.getElementById('laps');
+        lapsInput.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+        setTimeout(() => {
+            lapsInput.style.backgroundColor = '';
+        }, 1000);
+    }
+}
 
 // Convert snake_case to Title Case (e.g., max_verstappen -> Max Verstappen)
 function formatName(snakeCaseStr) {

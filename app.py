@@ -20,9 +20,9 @@ try:
     scaler = model_data.get('scaler')
     feature_names = model_data['feature_names']
     
-    print(f"✓ Successfully loaded {model_data.get('model_name', 'model')}")
+    print(f"[OK] Successfully loaded {model_data.get('model_name', 'model')}")
 except Exception as e:
-    print(f"✗ Failed to load model: {e}")
+    print(f"[ERROR] Failed to load model: {e}")
     print("Make sure you've run train.ipynb first!")
     exit(1)
 
@@ -37,12 +37,34 @@ def home():
 def get_dropdown_data():
     """
     Get all available options for the dropdowns
-    (drivers, teams, circuits from our dataset)
+    (drivers, teams, circuits from our dataset) plus circuit metadata
     """
+    # Define typical lap counts for circuits (fetched from historical data)
+    circuit_laps = {
+        "adelaide": 82, "ain-diab": 53, "aintree": 90, "albert_park": 58, "americas": 56,
+        "anderstorp": 80, "avus": 60, "bahrain": 57, "baku": 51, "boavista": 55,
+        "brands_hatch": 80, "bremgarten": 66, "buddh": 60, "catalunya": 66, "charade": 40,
+        "dallas": 67, "detroit": 63, "dijon": 80, "donington": 76, "essarts": 77,
+        "estoril": 71, "fuji": 73, "galvez": 100, "george": 85, "hockenheimring": 67,
+        "hungaroring": 70, "imola": 63, "indianapolis": 73, "interlagos": 71, "istanbul": 58,
+        "jacarepagua": 61, "jarama": 90, "jeddah": 50, "jerez": 69, "kyalami": 80,
+        "las_vegas": 50, "lemans": 80, "long_beach": 80, "losail": 57, "magny_cours": 72,
+        "marina_bay": 61, "miami": 57, "monaco": 78, "monsanto": 62, "montjuic": 75,
+        "monza": 53, "mosport": 90, "mugello": 59, "nivelles": 85, "nurburgring": 67,
+        "okayama": 83, "pedralbes": 80, "pescara": 18, "phoenix": 81, "portimao": 66,
+        "red_bull_ring": 71, "reims": 50, "ricard": 80, "riverside": 75, "rodriguez": 71,
+        "sebring": 42, "sepang": 56, "shanghai": 56, "silverstone": 52, "sochi": 53,
+        "spa": 44, "suzuka": 53, "tremblant": 90, "valencia": 57, "vegas": 50,
+        "villeneuve": 70, "watkins_glen": 110, "yas_marina": 58, "yeongam": 55,
+        "zandvoort": 72, "zeltweg": 54, "zolder": 70
+    }
+
     return jsonify({
         'drivers': sorted(list(driver_encoder.classes_)),
         'constructors': sorted(list(team_encoder.classes_)),
-        'circuits': sorted(list(circuit_encoder.classes_))
+        'circuits': sorted(list(circuit_encoder.classes_)),
+        'circuit_laps': circuit_laps,
+        'verified_features': feature_names
     })
 
 
