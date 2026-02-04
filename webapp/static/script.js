@@ -70,9 +70,8 @@ document.getElementById('predict-form').addEventListener('submit', async (e) => 
         constructor: document.getElementById('constructor').value,
         circuit: document.getElementById('circuit').value,
         grid: parseInt(document.getElementById('grid').value),
-        points: parseFloat(document.getElementById('points').value),
-        constructor_points: parseFloat(document.getElementById('constructor_points').value),
-        recent_position: parseFloat(document.getElementById('recent_position').value)
+        laps: parseInt(document.getElementById('laps').value),
+        points: parseFloat(document.getElementById('points').value)
     };
 
     try {
