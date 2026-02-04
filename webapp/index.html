@@ -48,13 +48,18 @@
                     </div>
 
                     <div class="form-group">
-                        <label><i class="fas fa-circle-notch"></i> Laps</label>
-                        <input type="number" id="laps" value="50" min="1" max="100">
+                        <label><i class="fas fa-star"></i> Driver Avg. Points (5 races)</label>
+                        <input type="number" id="points" value="0" min="0">
                     </div>
 
                     <div class="form-group">
-                        <label><i class="fas fa-star"></i> Current Points</label>
-                        <input type="number" id="points" value="0" min="0">
+                        <label><i class="fas fa-tools"></i> Const. Avg. Points (5 races)</label>
+                        <input type="number" id="constructor_points" value="0" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-list-ol"></i> Driver Avg. Position (5 races)</label>
+                        <input type="number" id="recent_position" value="10" min="1" max="20">
                     </div>
 
                     <button type="submit" class="btn-predict">
@@ -65,7 +70,7 @@
 
             <!-- Results panel on the right -->
             <div class="card result-panel">
-                <div class="result-title">AI Win Probability</div>
+                <div class="result-title">Win Probability</div>
 
                 <div class="loader" id="loader"></div>
 

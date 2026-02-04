@@ -20,9 +20,9 @@ try:
     scaler = model_data.get('scaler')
     feature_names = model_data['feature_names']
     
-    print(f"✓ Successfully loaded {model_data.get('model_name', 'model')}")
+    print(f"[OK] Successfully loaded {model_data.get('model_name', 'model')}")
 except Exception as e:
-    print(f"✗ Failed to load model: {e}")
+    print(f"[ERROR] Failed to load model: {e}")
     print("Make sure you've run train.ipynb first!")
     exit(1)
 
@@ -56,12 +56,16 @@ def predict_winner():
     
     try:
         # Extract input parameters
-        driver = data['driver']
-        team = data['constructor']
-        circuit = data['circuit']
-        grid_position = data['grid']
-        num_laps = data['laps']
-        current_points = data['points']
+        driver = data.get('driver')
+        team = data.get('constructor')
+        circuit = data.get('circuit')
+        grid_position = data.get('grid', 10)
+        
+        # New features mapping (User provides these or defaults)
+        driver_recent_points = data.get('points', 0) # Using 'points' input as proxy for recent form
+        constructor_recent_points = data.get('constructor_points', 0) 
+        driver_recent_position = data.get('recent_position', 10) 
+
         
         # Encoding categorical variables (convert names to numbers)
         # If we get something unknown, default to -1
@@ -73,21 +77,27 @@ def predict_winner():
         # Note: We're approximating driver age at 28 since we don't ask for DOB
         features_df = pd.DataFrame([{
             'grid': grid_position,
-            'points': current_points,
-            'laps': num_laps,
             'driverId_enc': driver_encoded,
             'constructorId_enc': team_encoded,
             'circuitId_enc': circuit_encoded,
-            'driver_age': 28  # Default assumption
+            'driver_age': 28,  # Default assumption
+            'driver_recent_points': driver_recent_points,
+            'constructor_recent_points': constructor_recent_points,
+            'driver_recent_position': driver_recent_position
         }])
         
         # Making sure features are in the right order
+        # Ensure all expected columns are present (fill missing with 0 if any)
+        for col in feature_names:
+            if col not in features_df.columns:
+                features_df[col] = 0
+        
         features_df = features_df[feature_names]
         
-        # Scaling the numerical features if we have a scaler
-        if scaler:
-            numerical_cols = ['grid', 'points', 'laps', 'driver_age']
-            features_df[numerical_cols] = scaler.transform(features_df[numerical_cols])
+        # Scaling the numerical features if we have a scaler (Model pipeline handles scaling usually, but logic here kept for compatibility if scaler was separate)
+        # Note: New model uses Pipeline with scaler inside for LR, but Tree models don't need it. 
+        # If scaler was saved in model_data, we would use it. (Our training script doesn't save separate scaler currently, but Pipeline does)
+        # If model is a pipeline, features_df is passed directly.
             
         # Get the prediction!
         win_probability = model.predict_proba(features_df)[0][1]
