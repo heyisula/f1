@@ -39,7 +39,7 @@ def get_dropdown_data():
     Get all available options for the dropdowns
     (drivers, teams, circuits from our dataset) plus circuit metadata
     """
-    # Define typical lap counts for circuits (fetched from historical data)
+    # Define typical lap counts for circuits
     circuit_laps = {
         "adelaide": 82, "ain-diab": 53, "aintree": 90, "albert_park": 58, "americas": 56,
         "anderstorp": 80, "avus": 60, "bahrain": 57, "baku": 51, "boavista": 55,

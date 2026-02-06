@@ -20,8 +20,6 @@ def get_circuit_laps():
     df = results.merge(races, on='raceId').merge(circuits, on='circuitId')
     
     # Get max laps per circuit reference
-    # Use max because some historical races might be shorter (e.g. rain)
-    # but the regulation distance is what we want for auto-fill
     circuit_laps = df.groupby('circuitRef')['laps'].max().to_dict()
     
     # Filter only for circuits we have in our encoder
