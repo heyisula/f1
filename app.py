@@ -3,10 +3,10 @@ F1 Race Winner Prediction API
 A Flask backend that serves predictions from our trained ML model.
 """
 
-from flask import Flask, render_template, request, jsonify
 import joblib
 import pandas as pd
 import numpy as np
+from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__, template_folder='webapp', static_folder='webapp/static')
 
